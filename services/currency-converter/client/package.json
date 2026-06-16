@@ -1,0 +1,10 @@
+{
+  "name": "currency-converter-client",
+  "version": "1.0.0",
+  "description": "I4 — Node.js CLI client for currency converter API",
+  "main": "cli.js",
+  "scripts": {
+    "test": "node --test cli.test.js"
+  },
+  "dependencies": {}
+}

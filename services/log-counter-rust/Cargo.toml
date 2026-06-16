@@ -1,0 +1,14 @@
+[package]
+name = "log-counter"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "log_counter"
+path = "src/lib.rs"
+
+[[bin]]
+name = "log-counter"
+path = "src/main.rs"
+
+[dependencies]

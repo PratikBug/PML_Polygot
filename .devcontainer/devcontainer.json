@@ -1,0 +1,17 @@
+{
+  "name": "Coding Agent Eval",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "rust-lang.rust-analyzer",
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  },
+  "forwardPorts": [8000, 8001, 8002, 3000, 8090, 9090, 3001],
+  "postCreateCommand": "make bootstrap"
+}

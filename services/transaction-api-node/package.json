@@ -1,0 +1,13 @@
+{
+  "name": "transaction-api-node",
+  "version": "1.0.0",
+  "description": "B5 — Node.js transaction API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test src/index.test.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

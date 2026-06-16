@@ -1,0 +1,10 @@
+groups:
+  - name: transaction_alerts
+    rules:
+      - alert: HighTransactionVolume
+        expr: http_requests_total > 100
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High request volume detected"

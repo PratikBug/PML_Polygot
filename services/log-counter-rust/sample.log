@@ -1,0 +1,7 @@
+INFO: Application started
+INFO: Loading configuration
+WARN: Deprecated API usage detected
+ERROR: Connection timeout to database
+INFO: Retrying connection
+WARN: High memory usage
+ERROR: Failed to write to cache

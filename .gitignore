@@ -1,0 +1,11 @@
+.git
+__pycache__
+*.pyc
+.pytest_cache
+node_modules
+target
+*.egg-info
+.DS_Store
+.env
+.terraform
+*.zip

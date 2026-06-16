@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: fraud
+      POSTGRES_PASSWORD: fraud
+      POSTGRES_DB: frauddb
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fraud -d frauddb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build: ./api
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgresql://fraud:fraud@db:5432/frauddb
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build: ./worker
+    environment:
+      FRAUD_API_URL: http://api:8002
+      SCORER_PATH: /app/scorer/fraud-scorer
+      WORKER_MODE: daemon
+      POLL_INTERVAL_MS: "5000"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  transaction-api:
+    build: ../../services/transaction-api-python
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
