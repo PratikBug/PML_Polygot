@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I4 Currency Converter</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    main { max-width: 520px; margin: 48px auto; padding: 0 24px; }
+    h1 { font-size: 28px; margin: 0; }
+    .muted { color: #94a3b8; font-size: 14px; }
+    form {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    label { display: grid; gap: 6px; }
+    select, input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: #e2e8f0;
+      font-size: 16px;
+    }
+    button {
+      background: #3b82f6;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { background: #475569; cursor: not-allowed; }
+    .error {
+      margin-top: 16px;
+      color: #f87171;
+      background: #450a0a;
+      padding: 12px;
+      border-radius: 8px;
+    }
+    .success {
+      margin-top: 16px;
+      background: #14532d;
+      color: #bbf7d0;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 18px;
+    }
+    .rate { font-size: 14px; color: #86efac; margin-top: 4px; }
+    code {
+      display: block;
+      background: #1e293b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="muted">I4 — Polyglot Demo</p>
+    <h1>Currency Converter</h1>
+    <p class="muted">FastAPI backend + Node CLI client. This page calls the same <code>/convert</code> API.</p>
+
+    <form id="form">
+      <label>
+        <span class="muted">From</span>
+        <select id="from">
+          <option>USD</option><option>EUR</option><option>GBP</option><option>JPY</option><option>INR</option>
+        </select>
+      </label>
+      <label>
+        <span class="muted">To</span>
+        <select id="to">
+          <option>EUR</option><option>USD</option><option>GBP</option><option>JPY</option><option>INR</option>
+        </select>
+      </label>
+      <label>
+        <span class="muted">Amount</span>
+        <input id="amount" type="number" min="0.01" step="any" value="100" />
+      </label>
+      <button type="submit" id="submit">Convert</button>
+    </form>
+
+    <div id="error" class="error" hidden></div>
+    <div id="result" class="success" hidden></div>
+
+    <section style="margin-top: 40px;">
+      <h2 style="font-size: 16px;">CLI equivalent</h2>
+      <code id="cli-hint">node client/cli.js USD EUR 100</code>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("form");
+    const from = document.getElementById("from");
+    const to = document.getElementById("to");
+    const amount = document.getElementById("amount");
+    const errorEl = document.getElementById("error");
+    const resultEl = document.getElementById("result");
+    const submitBtn = document.getElementById("submit");
+    const cliHint = document.getElementById("cli-hint");
+
+    function updateCliHint() {
+      cliHint.textContent = `node client/cli.js ${from.value} ${to.value} ${amount.value}`;
+    }
+    from.addEventListener("change", updateCliHint);
+    to.addEventListener("change", updateCliHint);
+    amount.addEventListener("input", updateCliHint);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorEl.hidden = true;
+      resultEl.hidden = true;
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Converting…";
+
+      try {
+        const parsed = parseFloat(amount.value);
+        if (isNaN(parsed) || parsed <= 0) throw new Error("Amount must be a positive number");
+
+        const res = await fetch("/convert", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from_currency: from.value,
+            to_currency: to.value,
+            amount: parsed,
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || `API error: ${res.status}`);
+
+        resultEl.innerHTML = `${data.amount} ${data.from_currency} = ${data.converted_amount} ${data.to_currency}<div class="rate">rate: ${data.rate}</div>`;
+        resultEl.hidden = false;
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Convert";
+      }
+    });
+  </script>
+</body>
+</html>

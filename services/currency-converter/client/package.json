@@ -4,7 +4,7 @@
   "description": "I4 — Node.js CLI client for currency converter API",
   "main": "cli.js",
   "scripts": {
-    "test": "node --test cli.test.js"
+    "test": "node --test *.test.js"
   },
   "dependencies": {}
 }

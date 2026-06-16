@@ -1,46 +1,66 @@
-# PML_Polygot — Coding Agent Evaluation Suite
+# I4 — Currency Converter (Polyglot: FastAPI + Node CLI)
 
-Complete solutions for **"What can you do using a coding agent?"** — all tasks (B1–B6, I1–I6, A1–A6, D1–D6) with runnable code, tests, and documentation.
+Evaluation submission for **I4: Polyglot service pair — FastAPI plus Node client**.
 
-## Quick Start
+## What this is
 
-```bash
-make bootstrap   # install deps for all services
-make test        # run all unit tests
-make e2e         # run docker-compose end-to-end stack test
-```
+A two-component currency converter:
+- **FastAPI** backend with `POST /convert` and hardcoded exchange rates
+- **Node.js CLI** client that calls the API
+- **Web demo** (`public/index.html`) for live reviewer testing on Vercel
 
-## Repository Structure
-
-| Path | Task | Description |
-|------|------|-------------|
-| `services/transaction-api-python/` | B4 | FastAPI transaction service |
-| `services/transaction-api-node/` | B5 | Node.js transaction API |
-| `services/log-counter-rust/` | B6 | Rust log-level counter CLI |
-| `services/currency-converter/` | I4 | FastAPI + Node CLI polyglot pair |
-| `systems/fraud-score/` | A3, D2 | Polyglot fraud-score mini-system |
-| `infra/` | D1, D4 | Terraform + Kubernetes manifests |
-| `observability/` | D6 | Prometheus + Grafana stack |
-| `docs/` | B1–B3, I1–I3, I6, A1–A6 | Documentation artifacts |
-
-Full task mapping: [docs/EVAL_INDEX.md](docs/EVAL_INDEX.md)
-
-## I4 — Currency Converter (highlight)
+## Quick proof (one command)
 
 ```bash
 cd services/currency-converter
-./scripts/verify.sh   # one-command proof (API + tests + E2E)
+./scripts/verify.sh
 ```
 
-See [services/currency-converter/README.md](services/currency-converter/README.md) for API reference and run instructions.
+**Result:** 15 API tests + 9 client tests + live E2E — all green.
 
-## Verified Tests (Local)
+## Test summary
 
-| Service | Tests |
-|---------|-------|
-| `transaction-api-python` | 11 passed |
-| `transaction-api-node` | 5 passed |
-| `currency-converter` api/cli | 8 passed |
-| `fraud-score` api/worker | 7 passed |
+| Component | Tests | Command |
+|-----------|-------|---------|
+| FastAPI API | 15 | `cd api && pytest -v` |
+| Node CLI | 9 | `cd client && npm test` |
+| E2E script | API + CLI + curl | `./scripts/verify.sh` |
 
-Rust tests run via `cargo test` in CI.
+## Two-terminal demo (local)
+
+**Terminal 1:**
+```bash
+cd services/currency-converter/api
+pip install -r requirements.txt
+uvicorn app.main:app --port 8001
+```
+
+**Terminal 2:**
+```bash
+cd services/currency-converter/client
+node cli.js USD EUR 100
+```
+
+## Vercel deployment (for reviewers)
+
+1. Push to GitHub
+2. Import in Vercel — root directory: `services/currency-converter`
+3. Share URL — reviewers get web UI + live API
+
+```bash
+CONVERTER_API_URL=https://YOUR_APP.vercel.app node client/cli.js USD EUR 100
+```
+
+## Project layout
+
+```
+services/currency-converter/
+├── api/                 # FastAPI + Mangum (Vercel)
+├── client/              # Node CLI (I4 requirement)
+├── public/index.html    # Web demo for testers
+├── scripts/verify.sh    # Full verification
+├── vercel.json
+└── README.md            # Full documentation
+```
+
+Full docs: [services/currency-converter/README.md](services/currency-converter/README.md)
